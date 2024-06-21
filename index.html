@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requerimientos Logísticos</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(function() { console.log('Service Worker Registered'); });
+    }
+  </script>
+</head>
+<body>
+  <h3>Datos del Solicitante</h3>
+  <form id="solicitanteForm">
+    <label for="nombreOperario">Nombre del Operario:</label><br>
+    <input type="text" id="nombreOperario" name="nombreOperario" required><br>
+    <label for="sede">Sede:</label><br>
+    <input type="text" id="sede" name="sede" required><br>
+    <label for="numeroServicio">Número de Servicio (PR):</label><br>
+    <input type="text" id="numeroServicio" name="numeroServicio" required><br>
+    <label for="fechaSolicitud">Fecha de Solicitud:</label><br>
+    <input type="date" id="fechaSolicitud" name="fechaSolicitud" required><br><br>
+  </form>
+
+  <h3>Requerimientos Logísticos</h3>
+  <table id="requerimientosTable">
+    <thead>
+      <tr>
+        <th>Descripción</th>
+        <th>Unidad de Medida</th>
+        <th>Cantidad</th>
+        <th>Fecha para la que se solicita</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+      </tr>
+    </tbody>
+  </table>
+  <button class="button" onclick="addRow()">Agregar Otra Fila</button>
+  <button class="button" onclick="submitData()">Enviar</button>
+
+  <script>
+    function addRow() {
+      const table = document.getElementById("requerimientosTable").getElementsByTagName('tbody')[0];
+      const newRow = table.insertRow();
+      for (let i = 0; i < 4; i++) {
+        const newCell = newRow.insertCell();
+        newCell.contentEditable = "true";
+      }
+    }
+
+    async function submitData() {
+      const nombreOperario = document.getElementById("nombreOperario").value;
+      const sede = document.getElementById("sede").value;
+      const numeroServicio = document.getElementById("numeroServicio").value;
+      const fechaSolicitud = document.getElementById("fechaSolicitud").value;
+
+      const table = document.getElementById("requerimientosTable").getElementsByTagName('tbody')[0];
+      const rows = table.rows;
+      const requerimientos = [];
+
+      for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].cells;
+        const requerimiento = {
+          descripcion: cells[0].innerText,
+          unidad: cells[1].innerText,
+          cantidad: cells[2].innerText,
+          fecha: cells[3].innerText
+        };
+        requerimientos.push(requerimiento);
+      }
+
+      const data = {
+        nombreOperario,
+        sede,
+        numeroServicio,
+        fechaSolicitud,
+        requerimientos
+      };
+
+      try {
+        // Aquí deberías enviar los datos a tu servidor
+        console.log('Datos enviados:', data);
+        alert('Datos enviados exitosamente');
+        document.getElementById("solicitanteForm").reset();
+        table.innerHTML = '';
+        addRow(); // Re-agrega la fila inicial
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al enviar los datos');
+      }
+    }
+  </script>
+</body>
+</html>
